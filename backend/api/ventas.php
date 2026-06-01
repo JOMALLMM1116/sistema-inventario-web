@@ -1,72 +1,67 @@
 <?php
-// backend/api/compras.php
+// backend/api/ventas.php
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// Ruta segura para tu clase DB
+// Cargamos tu archivo de configuración usando rutas seguras
 include_once __DIR__ . '/../config/db.php';
 
-// Conexión usando tu método estático
+// ADAPTACIÓN A TU CLASE REAL: Invocamos el método estático conectar()
 $db = DB::conectar();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents("php://input"), true);
 
-    if (!isset($data['id_proveedor'], $data['id_usuario'], $data['productos']) || !is_array($data['productos'])) {
-        echo json_encode(["status" => "error", "message" => "Datos incompletos para procesar la compra."]);
+    if (!isset($data['id_cliente'], $data['id_usuario'], $data['productos']) || !is_array($data['productos'])) {
+        echo json_encode(["status" => "error", "message" => "Datos incompletos para procesar la venta."]);
         exit;
     }
 
-    $id_proveedor = $data['id_proveedor'];
+    $id_cliente = $data['id_cliente'];
     $id_usuario = $data['id_usuario'];
+    $metodo_pago = $data['metodo_pago'] ?? 'Efectivo';
     $productos = $data['productos'];
 
-    // Estructura del TVP para Compras (id_producto, cantidad, precio_unitario)
+    // Estructura para el Table-Valued Parameter (TVP)
     $filas = [];
     foreach ($productos as $p) {
         $filas[] = [
             (int)$p['id_producto'], 
             (int)$p['cantidad'], 
-            (float)$p['precio_unitario']
+            (float)($p['descuento'] ?? 0.00)
         ];
     }
-    // El nombre del tipo de la BD va como CLAVE del array asociativo
-    $tvp = ["tipo_detalle_compra" => $filas];
+    $tvp = ["tipo_detalle_venta" => $filas];
 
-    // AJUSTE: Pasamos 4 parámetros. El tercero es un nvarchar de relleno por si el SP pide observaciones/documento
-    $tsql = "{call sp_registrar_compra(?, ?, ?, ?)}";
+    $tsql = "{call sp_registrar_venta(?, ?, ?, ?)}";
     $params = [
-        [$id_proveedor, SQLSRV_PARAM_IN],
+        [$id_cliente, SQLSRV_PARAM_IN],
         [$id_usuario, SQLSRV_PARAM_IN],
-        ['Compra desde API', SQLSRV_PARAM_IN], // Satisface el nvarchar(255) intermedio
-        [$tvp, SQLSRV_PARAM_IN]                // Manda el TVP en la cuarta posición
+        [$metodo_pago, SQLSRV_PARAM_IN],
+        [$tvp, SQLSRV_PARAM_IN]
     ];
 
     $stmt = sqlsrv_query($db, $tsql, $params);
 
     if ($stmt === false) {
-        echo json_encode([
-            "status" => "error", 
-            "message" => "Error de ejecución en el servidor.", 
-            "errors" => sqlsrv_errors()
-        ]);
+        echo json_encode(["status" => "error", "message" => "Error de ejecución en el servidor.", "errors" => sqlsrv_errors()]);
         exit;
     }
 
-    // Saltar resultados de los triggers intermedios y buscar el Mensaje o Error del SP
+    // Saltamos los resultados intermedios provocados por los triggers
     $resultado = null;
     do {
         while ($fila = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
             if ($fila !== null && (isset($fila['Mensaje']) || isset($fila['Error']))) {
                 $resultado = $fila;
-                break 2;
+                break 2; 
             }
         }
     } while (sqlsrv_next_result($stmt));
 
-    // Validar respuesta del Stored Procedure
+    // Validamos la respuesta final del Stored Procedure
     if ($resultado && isset($resultado['Error'])) {
         http_response_code(400);
         echo json_encode(["status" => "error", "message" => $resultado['Error']]);
@@ -74,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(["status" => "success", "message" => $resultado['Mensaje']]);
     } else {
         http_response_code(500);
-        echo json_encode(["status" => "error", "message" => "Compra ejecutada, pero la respuesta final fue interceptada."]);
+        echo json_encode(["status" => "error", "message" => "Transacción procesada, pero no se recuperó el mensaje de confirmación."]);
     }
 
     sqlsrv_free_stmt($stmt);

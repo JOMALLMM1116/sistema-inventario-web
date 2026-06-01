@@ -2,7 +2,7 @@
 // backend/api/productos.php
 
 require_once __DIR__ . '/../lib/respuesta.php';
-require_once __DIR__ . '/../config/db.php';
+include_once __DIR__ . '/../config/db.php';
 
 // 1. Inicializar cabeceras CORS y Content-Type JSON
 Respuesta::inicializarAPI();
