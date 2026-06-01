@@ -16,6 +16,7 @@ import Atencion from "./pages/Atencion";
 import Reportes from "./pages/Reportes";
 import Respaldo from "./pages/Respaldo";
 import Monitoreo from "./pages/Monitoreo";
+import Prediccion from "./pages/Prediccion";
 
 
 function Sistema() {
@@ -38,6 +39,7 @@ function Sistema() {
         <Route path="/respaldo" element={<Respaldo />} />
         <Route path="*" element={<Navigate to="/inventario" replace />} />
         <Route path="/monitoreo-rendimiento" element={<Monitoreo />} />
+        <Route path="/prediccion" element={<Prediccion />} />
       </Route>
     </Routes>
   );
