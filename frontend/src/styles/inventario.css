@@ -1,0 +1,154 @@
+/* src/styles/inventario.css */
+
+.inv-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 20px;
+}
+.inv-titulo {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--texto);
+}
+.inv-buscar { flex: 1; max-width: 340px; }
+.inv-buscar input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--borde);
+  border-radius: 9px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--superficie);
+  color: var(--texto);
+  outline: none;
+}
+.inv-buscar input:focus { border-color: var(--acento); }
+
+.inv-cargando, .inv-error {
+  padding: 40px;
+  color: var(--texto-suave);
+  text-align: center;
+}
+.inv-error { color: var(--error); }
+.inv-error small { color: var(--texto-suave); }
+
+/* metricas */
+.inv-metricas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 28px;
+}
+.metrica {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 20px;
+  transition: background 0.3s, border-color 0.3s;
+}
+.metrica-etq {
+  color: var(--texto-suave);
+  font-size: 13px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.metrica-punto {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+.metrica-punto.info { background: var(--info-fondo); color: var(--info); }
+.metrica-punto.exito { background: var(--exito-fondo); color: var(--exito); }
+.metrica-punto.alerta { background: var(--alerta-fondo); color: var(--alerta); }
+.metrica-punto.error { background: var(--error-fondo); color: var(--error); }
+.metrica-valor { font-size: 26px; font-weight: 700; color: var(--texto); }
+.metrica-sub { font-size: 12px; color: var(--texto-suave); margin-top: 4px; }
+
+/* panel/tabla */
+.inv-panel {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: background 0.3s, border-color 0.3s;
+}
+.inv-panel-cab {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--borde);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.inv-panel-cab h2 { font-size: 16px; font-weight: 600; color: var(--texto); }
+.inv-filtros { display: flex; gap: 8px; }
+.inv-filtros button {
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  padding: 6px 14px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--texto-suave);
+}
+.inv-filtros button.activo {
+  background: var(--sidebar-bg);
+  color: #fff;
+  border-color: var(--sidebar-bg);
+}
+
+.inv-tabla { width: 100%; border-collapse: collapse; }
+.inv-tabla thead th {
+  text-align: left;
+  padding: 12px 22px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--texto-suave);
+  background: var(--fondo);
+  border-bottom: 1px solid var(--borde);
+  font-weight: 600;
+}
+.inv-tabla tbody td {
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--borde);
+  font-size: 14px;
+  color: var(--texto);
+}
+.inv-tabla tbody tr:last-child td { border-bottom: none; }
+.inv-tabla tbody tr:hover { background: var(--superficie-2); }
+.inv-codigo { color: var(--texto-suave); font-family: monospace; font-size: 13px; }
+.inv-prod-nombre { font-weight: 600; }
+
+.inv-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.inv-dot { width: 7px; height: 7px; border-radius: 50%; }
+.inv-badge.ok { background: var(--exito-fondo); color: var(--exito); }
+.inv-badge.ok .inv-dot { background: var(--exito); }
+.inv-badge.bajo { background: var(--alerta-fondo); color: var(--alerta); }
+.inv-badge.bajo .inv-dot { background: var(--alerta); }
+.inv-badge.sin { background: var(--error-fondo); color: var(--error); }
+.inv-badge.sin .inv-dot { background: var(--error); }
+
+.inv-precio { font-weight: 600; }
+
+.inv-pie {
+  padding: 14px 22px;
+  color: var(--texto-suave);
+  font-size: 13px;
+}

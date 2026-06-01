@@ -1,0 +1,162 @@
+/* src/styles/carrito.css */
+
+/* modal mas ancho para el carrito */
+.carrito-modal {
+  background: var(--superficie);
+  border-radius: 14px;
+  padding: 28px;
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--sombra);
+}
+.carrito-modal h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--texto);
+}
+
+/* panel de compra (no modal, va en la pagina) */
+.carrito-panel {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 820px;
+}
+
+.carrito-cabecera {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.carrito-cabecera label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--texto-suave);
+}
+.carrito-cabecera select,
+.carrito-cabecera input {
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--borde);
+  border-radius: 9px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--fondo);
+  color: var(--texto);
+  outline: none;
+}
+.carrito-cabecera select:focus,
+.carrito-cabecera input:focus { border-color: var(--acento); }
+
+/* fila para agregar productos */
+.carrito-agregar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.carrito-agregar select {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--borde);
+  border-radius: 9px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--fondo);
+  color: var(--texto);
+  outline: none;
+}
+.carrito-agregar select:focus { border-color: var(--acento); }
+.carrito-agregar button {
+  background: var(--sidebar-bg);
+  color: #fff;
+  border: none;
+  padding: 0 20px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* tabla del carrito */
+.carrito-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+}
+.carrito-tabla thead th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--texto-suave);
+  border-bottom: 1px solid var(--borde);
+  font-weight: 600;
+}
+.carrito-tabla tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--borde);
+  font-size: 14px;
+  color: var(--texto);
+}
+.carrito-tabla input {
+  width: 80px;
+  padding: 6px 8px;
+  border: 1px solid var(--borde);
+  border-radius: 7px;
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--fondo);
+  color: var(--texto);
+  outline: none;
+}
+.carrito-tabla input:focus { border-color: var(--acento); }
+.carrito-tabla tbody button {
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  cursor: pointer;
+  color: var(--texto-suave);
+}
+.carrito-tabla tbody button:hover {
+  border-color: var(--error);
+  color: var(--error);
+}
+.carrito-vacio {
+  text-align: center;
+  color: var(--texto-suave);
+  padding: 24px !important;
+}
+
+.carrito-total {
+  text-align: right;
+  font-size: 17px;
+  color: var(--texto);
+  padding: 12px 0;
+  border-top: 2px solid var(--borde);
+}
+.carrito-total b {
+  font-size: 22px;
+  color: var(--acento);
+  margin-left: 8px;
+}
+
+.compra-ok {
+  background: var(--exito-fondo);
+  color: var(--exito);
+  padding: 11px 14px;
+  border-radius: 9px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}

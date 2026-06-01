@@ -70,4 +70,3 @@ export default function App() {
     </Router>
   );
 }
-// Actualización del flujo de trabajo - Sincronización de commits
