@@ -1,10 +1,12 @@
 // src/App.jsx
-// Router principal. Login publico + sistema protegido con todas las rutas.
+// Router principal. Login publico + sistema protegido. Cada ruta ademas
+// valida el rol con RutaProtegida (seguridad real, no solo ocultar el menu).
 
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login from "./pages/Login";
 import Layout from "./components/Layout";
+import RutaProtegida from "./components/RutaProtegida";
 import Inventario from "./pages/Inventario";
 import Clientes from "./pages/Clientes";
 import Proveedores from "./pages/Proveedores";
@@ -19,6 +21,22 @@ import Monitoreo from "./pages/Monitoreo";
 import Prediccion from "./pages/Prediccion";
 import Olap from "./pages/Olap";
 
+// los mismos roles que en el menu del Layout (deben coincidir)
+const PERM = {
+  inventario: ["Administrador", "Gerente", "Vendedor", "Inventario", "Compras"],
+  ventas: ["Administrador", "Gerente", "Vendedor"],
+  compras: ["Administrador", "Gerente", "Compras"],
+  clientes: ["Administrador", "Gerente", "Vendedor"],
+  proveedores: ["Administrador", "Gerente", "Compras"],
+  categorias: ["Administrador", "Gerente", "Inventario"],
+  atencion: ["Administrador", "Gerente", "Vendedor"],
+  reportes: ["Administrador", "Gerente", "Reportes"],
+  movimientos: ["Administrador", "Gerente", "Inventario"],
+  rendimiento: ["Administrador", "Gerente"],
+  prediccion: ["Administrador", "Gerente"],
+  olap: ["Administrador", "Gerente", "Reportes"],
+  respaldo: ["Administrador"],
+};
 
 function Sistema() {
   const { usuario } = useAuth();
@@ -28,20 +46,20 @@ function Sistema() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/inventario" element={<Inventario />} />
-        <Route path="/clientes" element={<Clientes />} />
-        <Route path="/proveedores" element={<Proveedores />} />
-        <Route path="/categorias" element={<Categorias />} />
-        <Route path="/movimientos" element={<Movimientos />} />
-        <Route path="/ventas" element={<Ventas />} />
-        <Route path="/compras" element={<Compras />} />
-        <Route path="/atencion" element={<Atencion />} />
-        <Route path="/reportes" element={<Reportes />} />
-        <Route path="/respaldo" element={<Respaldo />} />
+        <Route path="/inventario" element={<RutaProtegida roles={PERM.inventario}><Inventario /></RutaProtegida>} />
+        <Route path="/clientes" element={<RutaProtegida roles={PERM.clientes}><Clientes /></RutaProtegida>} />
+        <Route path="/proveedores" element={<RutaProtegida roles={PERM.proveedores}><Proveedores /></RutaProtegida>} />
+        <Route path="/categorias" element={<RutaProtegida roles={PERM.categorias}><Categorias /></RutaProtegida>} />
+        <Route path="/movimientos" element={<RutaProtegida roles={PERM.movimientos}><Movimientos /></RutaProtegida>} />
+        <Route path="/ventas" element={<RutaProtegida roles={PERM.ventas}><Ventas /></RutaProtegida>} />
+        <Route path="/compras" element={<RutaProtegida roles={PERM.compras}><Compras /></RutaProtegida>} />
+        <Route path="/atencion" element={<RutaProtegida roles={PERM.atencion}><Atencion /></RutaProtegida>} />
+        <Route path="/reportes" element={<RutaProtegida roles={PERM.reportes}><Reportes /></RutaProtegida>} />
+        <Route path="/respaldo" element={<RutaProtegida roles={PERM.respaldo}><Respaldo /></RutaProtegida>} />
+        <Route path="/monitoreo-rendimiento" element={<RutaProtegida roles={PERM.rendimiento}><Monitoreo /></RutaProtegida>} />
+        <Route path="/prediccion" element={<RutaProtegida roles={PERM.prediccion}><Prediccion /></RutaProtegida>} />
+        <Route path="/olap" element={<RutaProtegida roles={PERM.olap}><Olap /></RutaProtegida>} />
         <Route path="*" element={<Navigate to="/inventario" replace />} />
-        <Route path="/monitoreo-rendimiento" element={<Monitoreo />} />
-        <Route path="/prediccion" element={<Prediccion />} />
-        <Route path="/olap" element={<Olap />} />
       </Route>
     </Routes>
   );

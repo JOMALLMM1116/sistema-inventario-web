@@ -1,10 +1,7 @@
 // src/pages/Compras.jsx
-// Registro de compras con carrito. El detalle se manda como TVP a
-// sp_registrar_compra. A diferencia de ventas, aqui se captura el
-// precio_unitario de compra (no descuento), y se elige proveedor.
-//
-// Nota: el SP valida que el producto este asociado al proveedor
-// (tabla productoproveedor). Si no lo esta, devuelve error de negocio.
+// Registro de compras con carrito + historial de compras.
+// El detalle se manda como TVP a sp_registrar_compra.
+// El SP valida que el producto este asociado al proveedor (productoproveedor).
 
 import { useState, useEffect } from "react";
 import {
@@ -19,6 +16,7 @@ export default function Compras() {
   const { usuario } = useAuth();
   const [productos, setProductos] = useState([]);
   const [proveedores, setProveedores] = useState([]);
+  const [compras, setCompras] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
 
@@ -26,8 +24,19 @@ export default function Compras() {
   const [observaciones, setObservaciones] = useState("");
   const [carrito, setCarrito] = useState([]);
   const [prodSel, setProdSel] = useState("");
-  const [mensaje, setMensaje] = useState(null); // {tipo, texto}
+  const [mensaje, setMensaje] = useState(null);
   const [guardando, setGuardando] = useState(false);
+  const [modal, setModal] = useState(false);
+
+  // cargar historial de compras
+  function recargarHistorial() {
+    fetch("http://localhost:8080/api/compras.php")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.status === "success") setCompras(d.compras || []);
+      })
+      .catch(() => {});
+  }
 
   useEffect(() => {
     Promise.all([listarProductos(), listarProveedores()])
@@ -37,7 +46,17 @@ export default function Compras() {
       })
       .catch((e) => setError(e.message))
       .finally(() => setCargando(false));
+    recargarHistorial();
   }, []);
+
+  function abrirModal() {
+    setIdProveedor("");
+    setObservaciones("");
+    setCarrito([]);
+    setProdSel("");
+    setMensaje(null);
+    setModal(true);
+  }
 
   function agregar() {
     if (!prodSel) return;
@@ -100,6 +119,8 @@ export default function Compras() {
       setCarrito([]);
       setIdProveedor("");
       setObservaciones("");
+      recargarHistorial();
+      setTimeout(() => setModal(false), 1200);
     } catch (err) {
       setMensaje({ tipo: "error", texto: err.message });
     } finally {
@@ -113,120 +134,168 @@ export default function Compras() {
   return (
     <div>
       <div className="inv-encabezado">
-        <h1 className="inv-titulo">Registrar compra</h1>
+        <h1 className="inv-titulo">Compras</h1>
+        <button className="crud-boton-nuevo" onClick={abrirModal}>
+          + Nueva compra
+        </button>
       </div>
 
-      <div className="carrito-panel">
-        {mensaje && (
-          <div className={mensaje.tipo === "exito" ? "compra-ok" : "crud-form-error"}>
-            {mensaje.texto}
-          </div>
-        )}
-
-        <div className="carrito-cabecera">
-          <label>
-            Proveedor
-            <select value={idProveedor} onChange={(e) => setIdProveedor(e.target.value)}>
-              <option value="">Selecciona...</option>
-              {proveedores.map((p) => (
-                <option key={p.id_proveedor} value={p.id_proveedor}>
-                  {p.nombre}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Observaciones
-            <input
-              type="text"
-              value={observaciones}
-              onChange={(e) => setObservaciones(e.target.value)}
-              placeholder="Opcional"
-            />
-          </label>
+      {/* historial de compras */}
+      <div className="inv-panel">
+        <div className="inv-panel-cab">
+          <h2>Historial de compras</h2>
         </div>
-
-        <div className="carrito-agregar">
-          <select value={prodSel} onChange={(e) => setProdSel(e.target.value)}>
-            <option value="">Agregar producto...</option>
-            {productos.map((p) => (
-              <option key={p.id_producto} value={p.id_producto}>
-                {p.nombre} — stock {p.stock_actual}
-              </option>
-            ))}
-          </select>
-          <button type="button" onClick={agregar}>
-            Agregar
-          </button>
-        </div>
-
-        <table className="carrito-tabla">
+        <table className="inv-tabla">
           <thead>
             <tr>
-              <th>Producto</th>
-              <th>Cantidad</th>
-              <th>Precio unitario</th>
-              <th>Subtotal</th>
-              <th></th>
+              <th>#</th>
+              <th>Proveedor</th>
+              <th>Usuario</th>
+              <th>Fecha</th>
+              <th>Total</th>
+              <th>Estado</th>
             </tr>
           </thead>
           <tbody>
-            {carrito.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="carrito-vacio">
-                  Sin productos aun
+            {compras.map((c) => (
+              <tr key={c.id_compra}>
+                <td className="inv-codigo">#{c.id_compra}</td>
+                <td>{c.proveedor_nombre}</td>
+                <td>{c.usuario_nombre}</td>
+                <td>{c.fecha_compra}</td>
+                <td className="inv-precio">Q {Number(c.total).toFixed(2)}</td>
+                <td>
+                  <span className="inv-badge ok">
+                    <span className="inv-dot"></span> {c.estado}
+                  </span>
                 </td>
               </tr>
-            ) : (
-              carrito.map((x) => (
-                <tr key={x.id_producto}>
-                  <td>{x.nombre}</td>
-                  <td>
-                    <input
-                      type="number"
-                      min="1"
-                      value={x.cantidad}
-                      onChange={(e) => cambiar(x.id_producto, "cantidad", e.target.value)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={x.precio_unitario}
-                      onChange={(e) =>
-                        cambiar(x.id_producto, "precio_unitario", e.target.value)
-                      }
-                    />
-                  </td>
-                  <td>Q{(x.precio_unitario * x.cantidad).toFixed(2)}</td>
-                  <td>
-                    <button type="button" onClick={() => quitar(x.id_producto)}>
-                      {"\u2715"}
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
+            ))}
           </tbody>
         </table>
-
-        <div className="carrito-total">
-          Total: <b>Q {total.toFixed(2)}</b>
-        </div>
-
-        <div className="crud-modal-botones">
-          <button
-            type="button"
-            className="crud-guardar"
-            onClick={guardar}
-            disabled={guardando}
-          >
-            {guardando ? "Registrando..." : "Registrar compra"}
-          </button>
-        </div>
+        <div className="inv-pie">{compras.length} compras</div>
       </div>
+
+      {/* modal de nueva compra */}
+      {modal && (
+        <div className="crud-modal-fondo" onClick={() => setModal(false)}>
+          <div className="carrito-modal" onClick={(e) => e.stopPropagation()}>
+            <h2>Nueva compra</h2>
+            {mensaje && (
+              <div className={mensaje.tipo === "exito" ? "compra-ok" : "crud-form-error"}>
+                {mensaje.texto}
+              </div>
+            )}
+
+            <div className="carrito-cabecera">
+              <label>
+                Proveedor
+                <select value={idProveedor} onChange={(e) => setIdProveedor(e.target.value)}>
+                  <option value="">Selecciona...</option>
+                  {proveedores.filter((p) => Number(p.activo) === 1).map((p) => (
+                    <option key={p.id_proveedor} value={p.id_proveedor}>
+                      {p.nombre}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Observaciones
+                <input
+                  type="text"
+                  value={observaciones}
+                  onChange={(e) => setObservaciones(e.target.value)}
+                  placeholder="Opcional"
+                />
+              </label>
+            </div>
+
+            <div className="carrito-agregar">
+              <select value={prodSel} onChange={(e) => setProdSel(e.target.value)}>
+                <option value="">Agregar producto...</option>
+                {productos.map((p) => (
+                  <option key={p.id_producto} value={p.id_producto}>
+                    {p.nombre} — stock {p.stock_actual}
+                  </option>
+                ))}
+              </select>
+              <button type="button" onClick={agregar}>
+                Agregar
+              </button>
+            </div>
+
+            <table className="carrito-tabla">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th>Precio unitario</th>
+                  <th>Subtotal</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {carrito.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="carrito-vacio">
+                      Sin productos aun
+                    </td>
+                  </tr>
+                ) : (
+                  carrito.map((x) => (
+                    <tr key={x.id_producto}>
+                      <td>{x.nombre}</td>
+                      <td>
+                        <input
+                          type="number"
+                          min="1"
+                          value={x.cantidad}
+                          onChange={(e) => cambiar(x.id_producto, "cantidad", e.target.value)}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={x.precio_unitario}
+                          onChange={(e) =>
+                            cambiar(x.id_producto, "precio_unitario", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>Q{(x.precio_unitario * x.cantidad).toFixed(2)}</td>
+                      <td>
+                        <button type="button" onClick={() => quitar(x.id_producto)}>
+                          {"\u2715"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+
+            <div className="carrito-total">
+              Total: <b>Q {total.toFixed(2)}</b>
+            </div>
+
+            <div className="crud-modal-botones">
+              <button type="button" className="crud-cancelar" onClick={() => setModal(false)}>
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="crud-guardar"
+                onClick={guardar}
+                disabled={guardando}
+              >
+                {guardando ? "Registrando..." : "Registrar compra"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
