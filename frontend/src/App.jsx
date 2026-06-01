@@ -15,6 +15,8 @@ import Compras from "./pages/Compras";
 import Atencion from "./pages/Atencion";
 import Reportes from "./pages/Reportes";
 import Respaldo from "./pages/Respaldo";
+import Monitoreo from "./pages/Monitoreo";
+
 
 function Sistema() {
   const { usuario } = useAuth();
@@ -35,6 +37,7 @@ function Sistema() {
         <Route path="/reportes" element={<Reportes />} />
         <Route path="/respaldo" element={<Respaldo />} />
         <Route path="*" element={<Navigate to="/inventario" replace />} />
+        <Route path="/monitoreo-rendimiento" element={<Monitoreo />} />
       </Route>
     </Routes>
   );

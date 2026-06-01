@@ -32,6 +32,7 @@ const MENU = [
       { ruta: "/reportes", nombre: "Reportes", icono: "\u25B2" },
       { ruta: "/movimientos", nombre: "Movimientos", icono: "\u21C5" },
       { ruta: "/respaldo", nombre: "Respaldo", icono: "\u26C3" },
+      { ruta: "/monitoreo-rendimiento", nombre: "Rendimiento", icono: "\u26A1" },
     ],
   },
 ];
