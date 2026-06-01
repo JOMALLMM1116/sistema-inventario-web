@@ -34,6 +34,7 @@ const MENU = [
       { ruta: "/respaldo", nombre: "Respaldo", icono: "\u26C3" },
       { ruta: "/monitoreo-rendimiento", nombre: "Rendimiento", icono: "\u26A1" },
       { ruta: "/prediccion", nombre: "Prediccion IA", icono: "\u2728" },
+      { ruta: "/olap", nombre: "Analisis OLAP", icono: "\u25A4" },
     ],
   },
 ];

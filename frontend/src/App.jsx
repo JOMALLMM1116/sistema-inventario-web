@@ -17,6 +17,7 @@ import Reportes from "./pages/Reportes";
 import Respaldo from "./pages/Respaldo";
 import Monitoreo from "./pages/Monitoreo";
 import Prediccion from "./pages/Prediccion";
+import Olap from "./pages/Olap";
 
 
 function Sistema() {
@@ -40,6 +41,7 @@ function Sistema() {
         <Route path="*" element={<Navigate to="/inventario" replace />} />
         <Route path="/monitoreo-rendimiento" element={<Monitoreo />} />
         <Route path="/prediccion" element={<Prediccion />} />
+        <Route path="/olap" element={<Olap />} />
       </Route>
     </Routes>
   );
