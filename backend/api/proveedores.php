@@ -20,10 +20,15 @@ function ejecutarSP($conn, $tsql, $params = [])
     if ($stmt === false) {
         Respuesta::json("error", "Error al ejecutar la operacion.", ["errors" => sqlsrv_errors()], 500);
     }
+    // recorrer todos los resultados (los triggers generan intermedios) y
+    // quedarnos con la fila que traiga Mensaje o Error (la respuesta real del SP)
     $fila = null;
     do {
-        $fila = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
-        if ($fila !== null) break;
+        $f = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+        if ($f !== null && (isset($f['Mensaje']) || isset($f['Error']))) {
+            $fila = $f;
+            break;
+        }
     } while (sqlsrv_next_result($stmt));
     sqlsrv_free_stmt($stmt);
     return $fila;
