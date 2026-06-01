@@ -176,7 +176,7 @@ export default function Atencion() {
                   onChange={(e) => setForm({ ...form, id_cliente: e.target.value })}
                 >
                   <option value="">Selecciona...</option>
-                  {clientes.map((c) => (
+                  {clientes.filter((c) => Number(c.activo) === 1).map((c) => (
                     <option key={c.id_cliente} value={c.id_cliente}>
                       {c.nombre} {c.apellido}
                     </option>

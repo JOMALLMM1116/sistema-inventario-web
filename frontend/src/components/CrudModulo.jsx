@@ -1,35 +1,35 @@
 // src/components/CrudModulo.jsx
-// Componente reutilizable para los modulos de catalogo (clientes, proveedores,
-// categorias). Recibe la configuracion (titulo, columnas, campos del formulario
-// y las funciones de la API) y arma la tabla + el modal de crear/editar.
+// Componente reutilizable para catalogos (clientes, proveedores, categorias).
+// Ahora incluye filtro por estado (Todos / Activos / Inactivos) y muestra
+// el estado de cada registro con un badge. El boton de desactivar solo
+// aparece en los registros activos.
 
 import { useState, useEffect } from "react";
 import "../styles/crud.css";
 
 export default function CrudModulo({
   titulo,
-  idCampo,         // nombre del campo id (ej. "id_cliente")
-  columnas,        // [{ clave, etiqueta }] para la tabla
-  campos,          // [{ clave, etiqueta, tipo, opciones }] para el formulario
-  cargarLista,     // funcion que devuelve { ...datos } (la lista esta en data[claveLista])
-  claveLista,      // nombre de la propiedad con el array (ej. "clientes")
-  crear,           // funcion crear(datos)
-  actualizar,      // funcion actualizar(id, datos)
-  eliminar,        // funcion eliminar(id)
+  idCampo,
+  columnas,
+  campos,
+  cargarLista,
+  claveLista,
+  crear,
+  actualizar,
+  eliminar,
 }) {
   const [items, setItems] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
   const [busqueda, setBusqueda] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState("activos"); // todos | activos | inactivos
 
-  // estado del modal
   const [modalAbierto, setModalAbierto] = useState(false);
-  const [editando, setEditando] = useState(null); // null = crear, objeto = editar
+  const [editando, setEditando] = useState(null);
   const [form, setForm] = useState({});
   const [guardando, setGuardando] = useState(false);
   const [errorForm, setErrorForm] = useState("");
 
-  // cargar la lista
   function recargar() {
     setCargando(true);
     cargarLista()
@@ -43,10 +43,8 @@ export default function CrudModulo({
     // eslint-disable-next-line
   }, []);
 
-  // abrir modal para crear
   function abrirCrear() {
     setEditando(null);
-    // form vacio, con valores por defecto de los campos tipo select
     const inicial = {};
     campos.forEach((c) => {
       inicial[c.clave] = c.opciones ? c.opciones[0] : "";
@@ -56,7 +54,6 @@ export default function CrudModulo({
     setModalAbierto(true);
   }
 
-  // abrir modal para editar
   function abrirEditar(item) {
     setEditando(item);
     const inicial = {};
@@ -68,7 +65,6 @@ export default function CrudModulo({
     setModalAbierto(true);
   }
 
-  // guardar (crear o actualizar)
   async function guardar(e) {
     e.preventDefault();
     setErrorForm("");
@@ -88,7 +84,6 @@ export default function CrudModulo({
     }
   }
 
-  // desactivar
   async function desactivar(item) {
     if (!confirm(`Desactivar "${item[columnas[1].clave] || ""}"?`)) return;
     try {
@@ -99,16 +94,33 @@ export default function CrudModulo({
     }
   }
 
-  // filtrar por busqueda (sobre todas las columnas de texto)
-  const filtrados = items.filter((it) =>
-    busqueda === ""
-      ? true
-      : columnas.some((col) =>
-          String(it[col.clave] ?? "")
-            .toLowerCase()
-            .includes(busqueda.toLowerCase())
-        )
-  );
+  // saber si un item esta activo (la columna activo viene como 1/0 o true/false)
+  function esActivo(item) {
+    return Number(item.activo) === 1;
+  }
+
+  // filtrar por estado y por busqueda
+  const filtrados = items.filter((it) => {
+    // filtro de estado
+    const pasaEstado =
+      filtroEstado === "todos" ||
+      (filtroEstado === "activos" && esActivo(it)) ||
+      (filtroEstado === "inactivos" && !esActivo(it));
+    // filtro de busqueda
+    const pasaBusqueda =
+      busqueda === ""
+        ? true
+        : columnas.some((col) =>
+            String(it[col.clave] ?? "")
+              .toLowerCase()
+              .includes(busqueda.toLowerCase())
+          );
+    return pasaEstado && pasaBusqueda;
+  });
+
+  // conteos para mostrar en los botones
+  const totalActivos = items.filter((it) => esActivo(it)).length;
+  const totalInactivos = items.filter((it) => !esActivo(it)).length;
 
   if (cargando) return <p className="crud-cargando">Cargando {titulo.toLowerCase()}...</p>;
   if (error)
@@ -138,6 +150,28 @@ export default function CrudModulo({
         </div>
       </div>
 
+      {/* filtros de estado */}
+      <div className="crud-filtros">
+        <button
+          className={filtroEstado === "todos" ? "activo" : ""}
+          onClick={() => setFiltroEstado("todos")}
+        >
+          Todos ({items.length})
+        </button>
+        <button
+          className={filtroEstado === "activos" ? "activo" : ""}
+          onClick={() => setFiltroEstado("activos")}
+        >
+          Activos ({totalActivos})
+        </button>
+        <button
+          className={filtroEstado === "inactivos" ? "activo" : ""}
+          onClick={() => setFiltroEstado("inactivos")}
+        >
+          Inactivos ({totalInactivos})
+        </button>
+      </div>
+
       <div className="crud-panel">
         <table className="crud-tabla">
           <thead>
@@ -145,6 +179,7 @@ export default function CrudModulo({
               {columnas.map((col) => (
                 <th key={col.clave}>{col.etiqueta}</th>
               ))}
+              <th>Estado</th>
               <th></th>
             </tr>
           </thead>
@@ -154,13 +189,21 @@ export default function CrudModulo({
                 {columnas.map((col) => (
                   <td key={col.clave}>{it[col.clave]}</td>
                 ))}
+                <td>
+                  <span className={`crud-badge ${esActivo(it) ? "activo" : "inactivo"}`}>
+                    <span className="crud-dot"></span>
+                    {esActivo(it) ? "Activo" : "Inactivo"}
+                  </span>
+                </td>
                 <td className="crud-acciones">
                   <button onClick={() => abrirEditar(it)} title="Editar">
                     {"\u270E"}
                   </button>
-                  <button onClick={() => desactivar(it)} title="Desactivar">
-                    {"\u2715"}
-                  </button>
+                  {esActivo(it) && (
+                    <button onClick={() => desactivar(it)} title="Desactivar">
+                      {"\u2715"}
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -171,7 +214,6 @@ export default function CrudModulo({
         </div>
       </div>
 
-      {/* Modal de crear/editar */}
       {modalAbierto && (
         <div className="crud-modal-fondo" onClick={() => setModalAbierto(false)}>
           <div className="crud-modal" onClick={(e) => e.stopPropagation()}>

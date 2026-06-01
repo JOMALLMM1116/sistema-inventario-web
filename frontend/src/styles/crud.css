@@ -199,3 +199,43 @@
 }
 .crud-guardar:hover:not(:disabled) { background: var(--acento-hover); }
 .crud-guardar:disabled { opacity: 0.6; cursor: default; }
+
+/* filtros de estado (Todos / Activos / Inactivos) */
+.crud-filtros {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.crud-filtros button {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--texto-suave);
+  transition: all 0.15s;
+}
+.crud-filtros button:hover { color: var(--texto); }
+.crud-filtros button.activo {
+  background: var(--sidebar-bg);
+  color: #fff;
+  border-color: var(--sidebar-bg);
+}
+
+/* badge de estado en la tabla */
+.crud-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.crud-dot { width: 7px; height: 7px; border-radius: 50%; }
+.crud-badge.activo { background: var(--exito-fondo); color: var(--exito); }
+.crud-badge.activo .crud-dot { background: var(--exito); }
+.crud-badge.inactivo { background: var(--error-fondo); color: var(--error); }
+.crud-badge.inactivo .crud-dot { background: var(--error); }
