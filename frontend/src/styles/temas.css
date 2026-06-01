@@ -1,0 +1,100 @@
+/* src/styles/temas.css
+   Temas (claro / oscuro / gris) como variables CSS.
+   El tema activo se controla con el atributo data-tema en el <html>. */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root,
+[data-tema="claro"] {
+  --sidebar-bg: #091235;
+  --sidebar-borde: #2b4257;
+  --sidebar-txt: #88a9c3;
+  --sidebar-hover: #14202e;
+  --sidebar-titulo: #5a7088;
+
+  --fondo: #f4f6f9;
+  --superficie: #ffffff;
+  --superficie-2: #fafbfd;
+  --borde: #e1e6ed;
+  --texto: #1a2533;
+  --texto-suave: #5c6b7a;
+
+  --acento: #b68d40;
+  --acento-hover: #9a7634;
+  --acento-txt: #ffffff;
+
+  --exito: #1d9e75;  --exito-fondo: #e1f5ee;
+  --alerta: #ba7517; --alerta-fondo: #faeeda;
+  --error: #c0392b;  --error-fondo: #fcebeb;
+  --info: #185fa5;   --info-fondo: #e6f1fb;
+
+  --sombra: 0 10px 40px rgba(9, 18, 53, 0.12);
+}
+
+[data-tema="oscuro"] {
+  --sidebar-bg: #060b1f;
+  --sidebar-borde: #1e2d40;
+  --sidebar-txt: #8398b0;
+  --sidebar-hover: #14202e;
+  --sidebar-titulo: #4a5f78;
+
+  --fondo: #0c1424;
+  --superficie: #141e30;
+  --superficie-2: #1a2740;
+  --borde: #263650;
+  --texto: #e4e9f1;
+  --texto-suave: #8a99ae;
+
+  --acento: #d6ad60;
+  --acento-hover: #c39a4d;
+  --acento-txt: #0c1424;
+
+  --exito: #3fbe94;  --exito-fondo: #10301f;
+  --alerta: #e0a038; --alerta-fondo: #352405;
+  --error: #e5675a;  --error-fondo: #3a1512;
+  --info: #5294d6;   --info-fondo: #10243a;
+
+  --sombra: 0 10px 40px rgba(0, 0, 0, 0.45);
+}
+
+[data-tema="gris"] {
+  --sidebar-bg: #28221e;
+  --sidebar-borde: #463c34;
+  --sidebar-txt: #b0a99f;
+  --sidebar-hover: #3a322b;
+  --sidebar-titulo: #7a7066;
+
+  --fondo: #eceae7;
+  --superficie: #f7f6f4;
+  --superficie-2: #f0eeeb;
+  --borde: #d6d2cc;
+  --texto: #2c2c2a;
+  --texto-suave: #6b665f;
+
+  --acento: #826343;
+  --acento-hover: #6d533a;
+  --acento-txt: #ffffff;
+
+  --exito: #5a7d4f;  --exito-fondo: #e6ece2;
+  --alerta: #9c7434; --alerta-fondo: #f0e8d8;
+  --error: #a4493c;  --error-fondo: #f1e2df;
+  --info: #4a6378;   --info-fondo: #e3e8ec;
+
+  --sombra: 0 10px 40px rgba(40, 34, 30, 0.18);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Outfit', system-ui, sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+  font-size: 14px;
+  transition: background 0.3s, color 0.3s;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* la fuente con caracter para titulos */
+h1, h2, .display {
+  font-family: 'Fraunces', Georgia, serif;
+}

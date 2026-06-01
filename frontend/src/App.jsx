@@ -18,6 +18,11 @@ export default function App() {
   const [busqueda, setBusqueda] = useState('');
   const [tituloVista, setTituloVista] = useState('Panel de Inventario');
 
+function Sistema() {
+  const { usuario } = useAuth();
+  if (!usuario) {
+    return <Navigate to="/" replace />;
+  }
   return (
     <Router>
       <Routes>
