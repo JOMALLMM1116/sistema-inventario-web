@@ -31,6 +31,7 @@ const MENU = [
     items: [
       { ruta: "/reportes", nombre: "Reportes", icono: "\u25B2" },
       { ruta: "/movimientos", nombre: "Movimientos", icono: "\u21C5" },
+      { ruta: "/respaldo", nombre: "Respaldo", icono: "\u26C3" },
     ],
   },
 ];
